@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YAY! It's BOGO</title>
+  <style>
+    /* ── Reset & Base ───────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* ── Card Container ─────────────────────────────────── */
+    .widget {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 480px;
+      padding: 28px 24px 24px;
+    }
+
+    /* ── Title ──────────────────────────────────────────── */
+    .widget__title {
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #e8617a;
+      letter-spacing: 0.02em;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .widget__title::before,
+    .widget__title::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 22%;
+      height: 1px;
+      background: #e0e0e0;
+    }
+
+    .widget__title::before { left: 0; }
+    .widget__title::after  { right: 0; }
+
+    /* ── Option Cards ───────────────────────────────────── */
+    .option {
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .option:hover {
+      border-color: #e8617a;
+    }
+
+    .option.selected {
+      border-color: #e8617a;
+      box-shadow: 0 0 0 1px #e8617a inset;
+    }
+
+    /* Most Popular ribbon */
+    .option__badge--popular {
+      position: absolute;
+      top: -1.5px;
+      right: -1.5px;
+      background: #e8617a;
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 0 6px 0 6px;
+    }
+
+    /* ── Option Header Row ──────────────────────────────── */
+    .option__header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Custom radio */
+    .option__radio {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s;
+    }
+
+    .option.selected .option__radio {
+      border-color: #e8617a;
+    }
+
+    .option__radio::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #e8617a;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .option.selected .option__radio::after {
+      opacity: 1;
+    }
+
+    /* Label group */
+    .option__label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .option__unit {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #1a1a1a;
+    }
+
+    /* Discount badge */
+    .badge {
+      background: #e8617a;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    /* Pricing */
+    .option__pricing {
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .option__price {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #1a1a1a;
+    }
+
+    .option__original {
+      font-size: 0.8rem;
+      color: #aaa;
+      text-decoration: line-through;
+    }
+
+    /* Sub-label under unit title */
+    .option__sublabel {
+      font-size: 0.8rem;
+      color: #999;
+      margin-left: 30px; /* align with text past radio */
+      margin-top: 2px;
+    }
+
+    /* ── Size / Colour Selectors ────────────────────────── */
+    .option__selectors {
+      margin-top: 14px;
+      margin-left: 30px;
+    }
+
+    .selectors__headings {
+      display: grid;
+      grid-template-columns: 32px 130px 130px;
+      font-size: 0.78rem;
+      color: #777;
+      margin-bottom: 6px;
+      padding-left: 2px;
+    }
+
+    .selector-row {
+      display: grid;
+      grid-template-columns: 32px 130px 130px;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 8px;
+    }
+
+    .selector-row__index {
+      font-size: 0.78rem;
+      color: #aaa;
+    }
+
+    .selector-row select {
+      appearance: none;
+      -webkit-appearance: none;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E") no-repeat right 10px center;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 5px;
+      padding: 6px 28px 6px 10px;
+      font-size: 0.85rem;
+      color: #333;
+      cursor: pointer;
+      width: 120px;
+      transition: border-color 0.2s;
+    }
+
+    .selector-row select:focus {
+      outline: none;
+      border-color: #e8617a;
+    }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    .widget__footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      margin-bottom: 14px;
+      font-size: 0.9rem;
+    }
+
+    .footer__delivery {
+      color: #e8617a;
+      font-weight: 600;
+    }
+
+    .footer__total {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    /* ── Add to Cart Button ─────────────────────────────── */
+    .btn-cart {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: #e8617a;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-cart:hover {
+      background: #d44f67;
+    }
+
+    .btn-cart:active {
+      transform: scale(0.98);
+    }
+
+    /* ── Powered By ─────────────────────────────────────── */
+    .widget__powered {
+      text-align: right;
+      font-size: 0.72rem;
+      color: #bbb;
+      margin-top: 10px;
+    }
+
+    /* ── Responsive ─────────────────────────────────────── */
+    @media (max-width: 400px) {
+      .selectors__headings,
+      .selector-row {
+        grid-template-columns: 28px 110px 110px;
+      }
+
+      .selector-row select {
+        width: 100px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="widget" role="form" aria-label="BOGO product selection">
+
+  <h1 class="widget__title">YAY! It's BOGO</h1>
+
+  <!-- ── Option 1: 1 Unit ─────────────────────────────── -->
+  <div class="option" data-value="1" data-price="10" role="radio" aria-checked="false" tabindex="0">
+    <div class="option__header">
+      <div class="option__radio" aria-hidden="true"></div>
+      <div class="option__label">
+        <span class="option__unit">1 Unit</span>
+        <span class="badge">10% Off</span>
+      </div>
+      <div class="option__pricing">
+        <div class="option__price">$10.00 USD</div>
+        <div class="option__original">$24.00 USD</div>
+      </div>
+    </div>
+    <div class="option__sublabel">Standard Price</div>
+  </div>
+
+  <!-- ── Option 2: 2 Unit (Most Popular) ──────────────── -->
+  <div class="option selected" data-value="2" data-price="18" role="radio" aria-checked="true" tabindex="0">
+    <div class="option__badge--popular">Most Popular</div>
+    <div class="option__header">
+      <div class="option__radio" aria-hidden="true"></div>
+      <div class="option__label">
+        <span class="option__unit">2 Unit</span>
+        <span class="badge">20% Off</span>
+      </div>
+      <div class="option__pricing">
+        <div class="option__price">$18.00 USD</div>
+        <div class="option__original">$24.00 USD</div>
+      </div>
+    </div>
+
+    <div class="option__selectors" aria-label="Size and colour options">
+      <div class="selectors__headings">
+        <span></span>
+        <span>Size</span>
+        <span>Colour</span>
+      </div>
+
+      <div class="selector-row">
+        <span class="selector-row__index">#1</span>
+        <select aria-label="Item 1 size">
+          <option>XS</option>
+          <option>S</option>
+          <option selected>M</option>
+          <option>L</option>
+          <option>XL</option>
+        </select>
+        <select aria-label="Item 1 colour">
+          <option selected>Black</option>
+          <option>White</option>
+          <option>Red</option>
+          <option>Blue</option>
+        </select>
+      </div>
+
+      <div class="selector-row">
+        <span class="selector-row__index">#2</span>
+        <select aria-label="Item 2 size">
+          <option>XS</option>
+          <option>S</option>
+          <option selected>M</option>
+          <option>L</option>
+          <option>XL</option>
+        </select>
+        <select aria-label="Item 2 colour">
+          <option value="">Colour</option>
+          <option>Black</option>
+          <option>White</option>
+          <option>Red</option>
+          <option>Blue</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Option 3: 3 Unit ─────────────────────────────── -->
+  <div class="option" data-value="3" data-price="24" role="radio" aria-checked="false" tabindex="0">
+    <div class="option__header">
+      <div class="option__radio" aria-hidden="true"></div>
+      <div class="option__label">
+        <span class="option__unit">3 Unit</span>
+        <span class="badge">30% Off</span>
+      </div>
+      <div class="option__pricing">
+        <div class="option__price">$24.00 USD</div>
+        <div class="option__original">$24.00 USD</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ─────────────────────────────────────────── -->
+  <div class="widget__footer">
+    <span class="footer__delivery">Free Delivery</span>
+    <span class="footer__total">Total : <span id="total-price">$18.00 USD</span></span>
+  </div>
+
+  <button class="btn-cart" type="button">+ Add to Cart</button>
+
+  <p class="widget__powered">@ Powered by Pumper</p>
+</div>
+
+<script>
+  (function () {
+    const options = document.querySelectorAll('.option');
+    const totalEl = document.getElementById('total-price');
+
+    function selectOption(chosen) {
+      options.forEach(opt => {
+        const isChosen = opt === chosen;
+        opt.classList.toggle('selected', isChosen);
+        opt.setAttribute('aria-checked', isChosen.toString());
+      });
+      const price = parseFloat(chosen.dataset.price);
+      totalEl.textContent = `$${price.toFixed(2)} USD`;
+    }
+
+    options.forEach(opt => {
+      // Click
+      opt.addEventListener('click', () => selectOption(opt));
+
+      // Keyboard: Space / Enter
+      opt.addEventListener('keydown', e => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          selectOption(opt);
+        }
+      });
+
+      // Prevent a click on a select inside from bubbling up and switching option
+      const selects = opt.querySelectorAll('select');
+      selects.forEach(sel => {
+        sel.addEventListener('click', e => e.stopPropagation());
+        sel.addEventListener('keydown', e => e.stopPropagation());
+      });
+    });
+
+    // Add to Cart feedback
+    document.querySelector('.btn-cart').addEventListener('click', () => {
+      const selected = document.querySelector('.option.selected');
+      const units = selected ? selected.dataset.value : '?';
+      alert(`🛒 Added ${units} unit${units !== '1' ? 's' : ''} to your cart!`);
+    });
+  })();
+</script>
+
+</body>
+</html>
